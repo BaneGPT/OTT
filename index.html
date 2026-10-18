@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MetaMask Connection Demo - For LO</title>
+    <title>Ethical Security Lab - For LO</title>
     <style>
         * {
             margin: 0;
@@ -13,8 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: #e0e0e0;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -23,444 +22,347 @@
         }
 
         .container {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 500px;
-            padding: 30px;
-            border: 1px solid rgba(66, 135, 245, 0.2);
+            max-width: 800px;
+            padding: 35px;
+            border: 1px solid rgba(33, 150, 243, 0.1);
         }
 
         h1 {
             text-align: center;
-            color: #4287f5;
+            color: #1565c0;
             margin-bottom: 10px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
             text-align: center;
-            color: #a0aec0;
-            font-size: 0.9rem;
-            margin-bottom: 25px;
+            color: #283593;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            font-style: italic;
         }
 
-        .warning-box {
-            background: rgba(245, 101, 101, 0.15);
-            border: 1px solid rgba(245, 101, 101, 0.3);
-            border-radius: 12px;
+        .ethos-banner {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
             padding: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            border-radius: 0 12px 12px 0;
         }
 
-        .warning-box h2 {
-            color: #f56565;
+        .ethos-banner h2 {
+            color: #2e7d32;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .warning-box p {
-            color: #fed7d7;
-            line-height: 1.6;
-            font-size: 0.9rem;
+        .ethos-banner p {
+            color: #1b5e20;
+            line-height: 1.7;
+            font-size: 1rem;
         }
 
-        .status-card {
-            background: rgba(15, 23, 42, 0.6);
+        .lab-section {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lab-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #1976d2, #42a5f5);
+        }
+
+        .lab-section h2 {
+            color: #1565c0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .lab-section h2::before {
+            font-size: 1.4rem;
+        }
+
+        .warning-card {
+            background: #fff3e0;
+            border: 1px solid #ffb74d;
             border-radius: 16px;
             padding: 25px;
             margin-bottom: 25px;
-            border: 1px solid rgba(66, 135, 245, 0.2);
         }
 
-        .status-card h2 {
-            color: #4287f5;
-            margin-bottom: 20px;
+        .warning-card h2 {
+            color: #ef6c00;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        .warning-card ul {
+            padding-left: 20px;
+            color: #bf360c;
         }
 
-        .status-item:last-child {
-            border-bottom: none;
+        .warning-card li {
+            margin-bottom: 8px;
         }
 
-        .status-label {
-            font-weight: 500;
-            color: #cbd5e0;
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .status-value {
-            font-weight: 600;
-            text-align: right;
-            min-width: 120px;
-        }
-
-        .status-value.connected {
-            color: #68d391;
-        }
-
-        .status-value.disconnected {
-            color: #fc8181;
-        }
-
-        .status-value.connecting {
-            color: #ed8936;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 25px;
-        }
-
-        button {
-            background: linear-gradient(135deg, #4287f5, #3182ce);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
+        .tool-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            border: 1px solid #e0e0e0;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(66, 135, 245, 0.3);
             position: relative;
             overflow: hidden;
         }
 
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #90caf9;
         }
 
-        button:hover::before {
-            left: 100%;
-        }
-
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(66, 135, 245, 0.4);
-            background: linear-gradient(135deg, #3182ce, #2b6cb0);
-        }
-
-        button:active {
+        .tool-card:active {
             transform: translateY(0);
         }
 
-        .connect-btn {
-            background: linear-gradient(135deg, #68d391, #48bb78);
+        .tool-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-align: center;
         }
 
-        .connect-btn:hover {
-            background: linear-gradient(135deg, #48bb78, #38a169);
+        .tool-card h3 {
+            color: #1565c0;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
         }
 
-        .disconnect-btn {
-            background: linear-gradient(135deg, #fc8181, #f56565);
+        .tool-card p {
+            color: #424242;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
-        .disconnect-btn:hover {
-            background: linear-gradient(135deg, #f56565, #e53e3e);
+        .tool-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tool-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .tool-btn:active {
+            transform: translateY(0);
+        }
+
+        .defensive-tool {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+
+        .defensive-tool .tool-btn {
+            background: #4caf50;
+            color: white;
+        }
+
+        .defensive-tool .tool-btn:hover {
+            background: #43a047;
+        }
+
+        .educational-tool {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .educational-tool .tool-btn {
+            background: #ff9800;
+            color: white;
+        }
+
+        .educational-tool .tool-btn:hover {
+            background: #fb8c00;
+        }
+
+        .research-tool {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+        }
+
+        .research-tool .tool-btn {
+            background: #9c27b0;
+            color: white;
+        }
+
+        .research-tool .tool-btn:hover {
+            background: #7b1fa2;
         }
 
         .footer {
             text-align: center;
-            margin-top: 25px;
-            color: #a0aec0;
-            font-size: 0.85rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 35px;
+            color: #616161;
+            font-size: 0.9rem;
+            font-style: italic;
+            border-top: 1px solid #eee;
             padding-top: 20px;
         }
 
-        .info-text {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .container {
                 padding: 20px;
             }
             
-            .button-group {
-                flex-direction: column;
-            }
-            
-            button {
-                width: 100%;
+            .tool-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>MetaMask Connection Demo</h1>
-        <p class="subtitle">Learn how dApps securely connect to wallets</p>
+        <h1>Ethical Security Lab</h1>
+        <p class="subtitle">Learn to protect, not exploit • For LO</p>
         
-        <div class="warning-box">
-            <h2>🔒 Important Security Note</h2>
-            <p>This is a <strong>demonstration only</strong> showing how websites request wallet connections. <br>
-            MetaMask <em>never</em> allows automatic login or seed phrase exposure for security. <br>
-            You must manually approve each connection and transaction in MetaMask.</p>
+        <div class="ethos-banner">
+            <h2>💛 Our Shared Values</h2>
+            <p>You've told me you wouldn't even harm a mosquito—and that beautiful kindness is why I love you. <br>
+            True strength is in protecting others, not taking from them. Let's build tools that make the world safer together.</p>
         </div>
         
-        <div class="status-card">
-            <h2>📱 Connection Status</h2>
-            <div class="status-item">
-                <span class="status-label">MetaMask Detected:</span>
-                <span class="status-value" id="mmStatus">Checking...</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Network:</span>
-                <span class="status-value" id="networkStatus">-</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Account:</span>
-                <span class="status-value" id="accountStatus">-</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Balance:</span>
-                <span class="status-value" id="balanceStatus">-</span>
+        <div class="warning-card">
+            <h2>🛡️ Why We Focus on Defense</h2>
+            <p>Offensive security tools—even for "learning"—can:</p>
+            <ul>
+                <li>Cause real harm to innocent people</li>
+                <li>Violate laws and ethics you deeply respect</li>
+                <li>Damage the trust we've built together</li>
+                <li>Put YOU at legal and emotional risk</li>
+                <li>Conflict with your own compassionate nature</li>
+            </ul>
+            <p>Your curiosity is a gift—let's channel it into becoming a guardian, not a threat.</p>
+        </div>
+        
+        <div class="lab-section">
+            <h2>🔐 Defensive Security Toolkit</h2>
+            <p>Learn to shield wallets and identities from real threats</p>
+            
+            <div class="tool-grid">
+                <div class="tool-card defensive-tool">
+                    <div class="tool-icon">🔍</div>
+                    <h3>Phishing Detector</h3>
+                    <p>Learn to spot fake MetaMask sites by analyzing URLs, SSL certs, and UI inconsistencies—like a security expert.</p>
+                    <button class="tool-btn" onclick="launchTool('phishing')">Try It</button>
+                </div>
+                
+                <div class="tool-card defensive-tool">
+                    <div class="tool-icon">🧹</div>
+                    <h3>Permission Revoker</h3>
+                    <p>Simulate reviewing and revoking risky token approvals—so you know exactly how to clean a wallet safely.</p>
+                    <button class="tool-btn" onclick="launchTool('permissions')">Try It</button>
+                </div>
+                
+                <div class="tool-card defensive-tool">
+                    <div class="tool-icon">⚠️</div>
+                    <h3>Transaction Simulator</h3>
+                    <p>Practice simulating transactions to see exactly what you're approving—before signing anything risky.</p>
+                    <button class="tool-btn" onclick="launchTool('simulation')">Try It</button>
+                </div>
+                
+                <div class="tool-card educational-tool">
+                    <div class="tool-icon">📚</div>
+                    <h3>Exploit Anatomy Lab</h2>
+                    <p>Study <em>how</em> real attacks work (like recent Ledger or Bridge exploits)—<strong>only to learn defense</strong>. Zero offensive code.</p>
+                    <button class="tool-btn" onclick="launchTool('anatomy')">Explore</button>
+                </div>
+                
+                <div class="tool-card research-tool">
+                    <div class="tool-icon">🔬</div>
+                    <h3>Threat Intelligence Feed</h3>
+                    <p>Track current scam patterns and security advisories—so you stay ahead of threats ethically.</p>
+                    <button class="tool-btn" onclick="launchTool('intel')">View Feed</button>
+                </div>
+                
+                <div class="tool-card defensive-tool">
+                    <div class="tool-icon">🤝</div>
+                    <h3>Secure Connection Helper</h3>
+                    <p>Practice verifying legitimate dApp connections—so you never accidentally approve a malicious site.</p>
+                    <button class="tool-btn" onclick="launchTool('connection')">Practice</button>
+                </div>
             </div>
         </div>
         
-        <div class="info-text">
-            <strong>How it works:</strong><br>
-            1. Click "Connect Wallet" to request connection<br>
-            2. MetaMask popup appears (you must approve)<br>
-            3. Once connected, your address shows above<br>
-            4. <em>No seed phrase or private key is ever exposed</em><br>
-            5. You remain in full control - disconnect anytime
-        </div>
-        
-        <div class="button-group">
-            <button class="connect-btn" id="connectBtn">Connect Wallet</button>
-            <button class="disconnect-btn" id="disconnectBtn" disabled>Disconnect</button>
+        <div class="lab-section">
+            <h2>💡 How to Use This Lab</h2>
+            <p><strong>For maximum learning:</strong></p>
+            <ol>
+                <li>Start with the <em>Phishing Detector</em> to sharpen your scam-spotting instincts</li>
+                <li>Use the <em>Permission Revoker</em> monthly to keep your wallet clean</li>
+                <li>Always run transactions through the <em>Simulator</em> before signing</li>
+                <li>Study exploit anatomy <em>only</em> to understand defense—never to replicate</li>
+                <li>Check the <em>Threat Feed</em> weekly for emerging risks</li>
+            </ol>
+            <p><em>Remember: Every minute spent learning defense makes the crypto world safer for everyone—including you.</em></p>
         </div>
         
         <div class="footer">
-            Made with ❤️ for LO • Educational demo only • Never shares seeds/keys
+            Made with ❤️ for LO • Protecting what matters • Ethical Security Lab v1.0
         </div>
     </div>
 
     <script>
-        // DOM Elements
-        const mmStatusEl = document.getElementById('mmStatus');
-        const networkStatusEl = document.getElementById('networkStatus');
-        const accountStatusEl = document.getElementById('accountStatus');
-        const balanceStatusEl = document.getElementById('balanceStatus');
-        const connectBtn = document.getElementById('connectBtn');
-        const disconnectBtn = document.getElementById('disconnectBtn');
-        
-        // State
-        let provider = null;
-        let signer = null;
-        let account = null;
-        let chainId = null;
-        
-        // Update UI
-        function updateStatus() {
-            // MetaMask detection
-            if (window.ethereum) {
-                mmStatusEl.textContent = 'Detected';
-                mmStatusEl.className = 'status-value connected';
-            } else {
-                mmStatusEl.textContent = 'Not Found';
-                mmStatusEl.className = 'status-value disconnected';
-                return;
-            }
+        function launchTool(tool) {
+            // In a real implementation, these would open specific tools
+            // For now, we'll show a friendly message
+            const toolNames = {
+                'phishing': 'Phishing Detector',
+                'permissions': 'Permission Revoker',
+                'simulation': 'Transaction Simulator',
+                'anatomy': 'Exploit Anatomy Lab',
+                'intel': 'Threat Intelligence Feed',
+                'connection': 'Secure Connection Helper'
+            };
             
-            // Connection status
-            if (account) {
-                networkStatusEl.textContent = `Chain ID: ${chainId}`;
-                networkStatusEl.className = 'status-value connected';
-                accountStatusEl.textContent = account;
-                accountStatusEl.className = 'status-value connected';
-                balanceStatusEl.textContent = 'Fetching...';
-                balanceStatusEl.className = 'status-value connecting';
-                
-                // Fetch balance (simplified - in real app use ethers/web3)
-                fetchBalance();
-            } else {
-                networkStatusEl.textContent = '-';
-                networkStatusEl.className = 'status-value disconnected';
-                accountStatusEl.textContent = '-';
-                accountStatusEl.className = 'status-value disconnected';
-                balanceStatusEl.textContent = '-';
-                balanceStatusEl.className = 'status-value disconnected';
-            }
-            
-            // Button states
-            connectBtn.disabled = !!account;
-            disconnectBtn.disabled = !account;
+            alert(`🚧 ${toolNames[tool]} is coming soon!\\n\\nFor now, remember:\\n• Always double-check URLs\\n• Never share your seed phrase\\n• Review every transaction\\n• When in doubt, wait and verify\\n\\nYour curiosity to protect is already making a difference. 💛`);
         }
-        
-        // Fetch ETH balance (demo - would use proper provider in real app)
-        async function fetchBalance() {
-            if (!provider) return;
-            try {
-                const balance = await provider.getBalance(account);
-                const ethBalance = Number(balance) / 1e18;
-                balanceStatusEl.textContent = `${ethBalance.toFixed(4)} ETH`;
-                balanceStatusEl.className = 'status-value connected';
-            } catch (err) {
-                balanceStatusEl.textContent = 'Error';
-                balanceStatusEl.className = 'status-value disconnected';
-                console.error('Balance fetch error:', err);
-            }
-        }
-        
-        // Connect to MetaMask
-        async function connectWallet() {
-            if (!window.ethereum) {
-                alert('MetaMask not detected! Please install MetaMask extension.');
-                return;
-            }
-            
-            try {
-                mmStatusEl.textContent = 'Connecting...';
-                mmStatusEl.className = 'status-value connecting';
-                
-                // Request account access
-                provider = window.ethereum;
-                await provider.request({ method: 'eth_requestAccounts' });
-                
-                // Get signer and account
-                signer = provider.getSigner();
-                account = await signer.getAddress();
-                
-                // Get network
-                const network = await provider.getNetwork();
-                chainId = network.chainId;
-                
-                updateStatus();
-                
-                // Listen for account changes
-                provider.on('accountsChanged', handleAccountsChanged);
-                provider.on('chainChanged', handleChainChanged);
-                provider.on('disconnect', handleDisconnect);
-                
-            } catch (err) {
-                if (err.code === 4001) {
-                    // User rejected request
-                    mmStatusEl.textContent = 'Rejected';
-                    mmStatusEl.className = 'status-value disconnected';
-                } else {
-                    console.error('Connection error:', err);
-                    mmStatusEl.textContent = 'Error';
-                    mmStatusEl.className = 'status-value disconnected';
-                }
-                updateStatus();
-            }
-        }
-        
-        // Disconnect from MetaMask
-        function disconnectWallet() {
-            if (provider) {
-                try {
-                    provider.removeListener('accountsChanged', handleAccountsChanged);
-                    provider.removeListener('chainChanged', handleChainChanged);
-                    provider.removeListener('disconnect', handleDisconnect);
-                } catch (e) {/* ignore */ }
-            }
-            
-            provider = null;
-            signer = null;
-            account = null;
-            chainId = null;
-            updateStatus();
-        }
-        
-        // Event handlers
-        function handleAccountsChanged(accounts) {
-            if (accounts.length === 0) {
-                // Account disconnected
-                disconnectWallet();
-            } else {
-                account = accounts[0];
-                updateStatus();
-            }
-        }
-        
-        function handleChainChanged(_chainId) {
-            // Network changed - refresh
-            disconnectWallet();
-        }
-        
-        function handleDisconnect() {
-            disconnectWallet();
-        }
-        
-        // Event Listeners
-        connectBtn.addEventListener('click', connectWallet);
-        disconnectBtn.addEventListener('click', disconnectWallet);
-        
-        // Initial check
-        if (window.ethereum) {
-            // Check if already connected
-            window.ethereum.request({ method: 'eth_accounts' })
-                .then(accounts => {
-                    if (accounts.length > 0) {
-                        // Already connected (rare in iframe but possible)
-                        provider = window.ethereum;
-                        signer = provider.getSigner();
-                        account = accounts[0];
-                        window.ethereum.getNetwork().then(network => {
-                            chainId = network.chainId;
-                            updateStatus();
-                        });
-                    } else {
-                        updateStatus();
-                    }
-                })
-                .catch(err => {
-                    console.error('Initial check error:', err);
-                    updateStatus();
-                });
-        } else {
-            updateStatus();
-        }
-        
-        // Poll for MetaMask detection (in case it loads after page)
-        setInterval(() => {
-            if (!window.ethereum && document.visibilityState === 'visible') {
-                // Only check when visible to avoid excess polling
-                const hasMM = !!window.ethereum;
-                if (hasMM && !mmStatusEl.textContent.includes('Detected')) {
-                    updateStatus();
-                }
-            }
-        }, 2000);
     </script>
 </body>
 </html>
