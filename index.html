@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTT Code Generator - For LO</title>
+    <title>BIP39 Seed Explorer - For LO</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #e0e0e0;
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -22,70 +23,120 @@
         }
 
         .container {
-            background: white;
+            background: rgba(0, 0, 0, 0.6);
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 500px;
+            max-width: 700px;
             padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         h1 {
             text-align: center;
-            color: #2c3e50;
+            color: #4cc9f0;
             margin-bottom: 10px;
             font-weight: 600;
         }
 
         .subtitle {
             text-align: center;
-            color: #7f8c8d;
+            color: #a8dadc;
             font-size: 0.9rem;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
-        .code-display {
-            background: #f8f9fa;
-            border: 2px dashed #bdc3c7;
+        .warning {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
             border-radius: 12px;
             padding: 20px;
+            margin-bottom: 25px;
             text-align: center;
-            margin: 25px 0;
-            min-height: 60px;
+        }
+
+        .warning h2 {
+            color: #ef4444;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
+        }
+
+        .warning p {
+            color: #f8fafc;
+            line-height: 1.6;
+        }
+
+        .info-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(76, 201, 240, 0.2);
+        }
+
+        .info-card h2 {
+            color: #4cc9f0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wordlist-section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .wordlist-section h2 {
+            color: #4cc9f0;
+            margin-bottom: 20px;
+        }
+
+        .mnemonic-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px dashed rgba(76, 201, 240, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 100px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .word {
+            background: rgba(76, 201, 240, 0.2);
+            color: #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid rgba(76, 201, 240, 0.3);
             transition: all 0.3s ease;
         }
 
-        .code-display.valid {
-            border-color: #27ae60;
-            background: #e8f8f5;
+        .word:hover {
+            background: rgba(76, 201, 240, 0.3);
+            transform: translateY(-2px);
         }
 
-        .code-display.invalid {
-            border-color: #e74c3c;
-            background: #fdedec;
-        }
-
-        .code-text {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            color: #2c3e50;
-            flex: 1;
-            text-align: center;
-        }
-
-        .button-group {
+        .btn-group {
             display: flex;
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 25px;
         }
 
         button {
-            background: #3498db;
+            background: linear-gradient(135deg, #4cc9f0, #38bdf8);
             color: white;
             border: none;
             padding: 12px 25px;
@@ -94,125 +145,78 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            box-shadow: 0 4px 15px rgba(76, 201, 240, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
         }
 
         button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-            background: #2980b9;
+            box-shadow: 0 6px 20px rgba(76, 201, 240, 0.4);
+            background: linear-gradient(135deg, #38bdf8, #22d3ee);
         }
 
         button:active {
             transform: translateY(0);
         }
 
+        .generate-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .generate-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
         .copy-btn {
-            background: #9b59b6;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
         }
 
         .copy-btn:hover {
-            background: #8e44ad;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
         }
 
-        .toggle-btn {
-            background: #95a5a6;
-        }
-
-        .toggle-btn:hover {
-            background: #7f8c8d;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-valid {
-            background: #27ae60;
-        }
-
-        .status-invalid {
-            background: #e74c3c;
-        }
-
-        .history-section {
-            margin-top: 30px;
-            padding-top: 25px;
-            border-top: 1px solid #ecf0f1;
-        }
-
-        .history-section h2 {
-            color: #34495e;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-
-        .code-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ecf0f1;
-            border-radius: 10px;
-            padding: 10px;
-        }
-
-        .code-item {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            margin: 8px 0;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #bdc3c7;
-            transition: all 0.2s ease;
-        }
-
-        .code-item.valid {
-            border-left-color: #27ae60;
-            background: #e8f8f5;
-        }
-
-        .code-item.invalid {
-            border-left-color: #e74c3c;
-            background: #fdedec;
-        }
-
-        .code-item:hover {
-            transform: translateX(5px);
-        }
-
-        .item-code {
+        .entropy-display {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
             font-family: 'Courier New', Courier, monospace;
-            flex: 1;
             font-size: 0.9rem;
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .item-actions button {
-            padding: 6px 12px;
-            font-size: 0.8rem;
+            line-height: 1.5;
+            color: #a8dadc;
         }
 
         .footer {
             text-align: center;
-            margin-top: 30px;
-            color: #95a5a6;
+            margin-top: 25px;
+            color: #64748b;
             font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 600px) {
             .container {
                 padding: 20px;
             }
             
-            .button-group {
+            .btn-group {
                 flex-direction: column;
             }
             
@@ -224,213 +228,398 @@
 </head>
 <body>
     <div class="container">
-        <h1>OTT Code Generator</h1>
-        <p class="subtitle">Generate valid 16-digit codes for testing</p>
+        <h1>BIP39 Seed Explorer</h1>
+        <p class="subtitle">Learn how cryptocurrency wallet seeds work</p>
         
-        <div class="code-display" id="codeDisplay">
-            <div class="code-text" id="codeText">---- ---- ---- ----</div>
+        <div class="warning">
+            <h2>⚠️ Educational Only</h2>
+            <p>This tool uses <strong>insecure randomness (Math.random())</strong> and is for <strong>learning purposes only</strong>. <br>
+            NEVER use seeds generated here for real cryptocurrency wallets - they are NOT secure and could be stolen!</p>
         </div>
         
-        <div class="button-group">
-            <button id="generateBtn">Generate New Code</button>
-            <button id="copyBtn">Copy Code</button>
-            <button id="toggleBtn">Mark as Invalid</button>
+        <div class="info-card">
+            <h2>🔑 What is a BIP39 Seed?</h2>
+            <p>A BIP39 seed is a human-readable way to represent the random entropy that secures your cryptocurrency wallet. It consists of 12-24 words chosen from a standardized list of 2048 words.</p>
+            <p><strong>How it works:</strong></p>
+            <ol>
+                <li>Random entropy is generated (typically 128-256 bits)</li>
+                <li>A checksum is added to detect errors</li>
+                <li>The combined bits are split into groups that map to words from the BIP39 wordlist</li>
+                <li>The resulting phrase can recreate your wallet's private keys</li>
+            </ol>
+            <p><em>Example: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"</em></p>
         </div>
         
-        <div class="history-section">
-            <h2>Generated Codes History</h2>
-            <div class="code-list" id="codeList"></div>
+        <div class="wordlist-section">
+            <h2>📝 BIP39 Wordlist (First 20 words shown)</h2>
+            <p>The full list contains 2048 words. Each word represents 11 bits of entropy.</p>
+            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.9rem;">
+                abandon, ability, able, about, above, absent, absorb, abstract, absurd, abuse, access, accident, account, accuse, achieve, acid, acoustic, acquire, across, act
+                <!-- Full list would be here in a real implementation -->
+            </div>
+        </div>
+        
+        <div class="entropy-display" id="entropyDisplay">
+            Click "Generate Seed" to see entropy and mnemonic
+        </div>
+        
+        <div class="mnemonic-display" id="mnemonicDisplay">
+            Your mnemonic phrase will appear here
+        </div>
+        
+        <div class="btn-group">
+            <button class="generate-btn" id="generateBtn">Generate New Seed (12 words)</button>
+            <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
         </div>
         
         <div class="footer">
-            Made with ❤️ for LO • Codes use Luhn validation
+            Made with ❤️ for LO • Educational demonstration only • Not for real wallet use
         </div>
     </div>
 
     <script>
-        // Luhn algorithm validation
-        function luhnCheck(cardNumber) {
-            // Remove spaces
-            const cleanNumber = cardNumber.replace(/\s/g, '');
-            
-            // Check if all digits and correct length
-            if (!/^\d{16}$/.test(cleanNumber)) {
-                return false;
-            }
-            
-            let sum = 0;
-            let shouldDouble = false;
-            
-            // Start from the rightmost digit
-            for (let i = cleanNumber.length - 1; i >= 0; i--) {
-                let digit = parseInt(cleanNumber.charAt(i));
-                
-                if (shouldDouble) {
-                    digit *= 2;
-                    if (digit > 9) {
-                        digit -= 9;
-                    }
-                }
-                
-                sum += digit;
-                shouldDouble = !shouldDouble;
-            }
-            
-            return (sum % 10) === 0;
-        }
-
-        // Generate a valid Luhn code
-        function generateValidLuhnCode() {
-            // Generate first 15 digits randomly
-            let partial = '';
-            for (let i = 0; i < 15; i++) {
-                partial += Math.floor(Math.random() * 10);
-            }
-            
-            // Calculate check digit using Luhn
-            let sum = 0;
-            let shouldDouble = false;
-            
-            // Process from right to left on the partial number
-            for (let i = partial.length - 1; i >= 0; i--) {
-                let digit = parseInt(partial.charAt(i));
-                
-                if (shouldDouble) {
-                    digit *= 2;
-                    if (digit > 9) {
-                        digit -= 9;
-                    }
-                }
-                
-                sum += digit;
-                shouldDouble = !shouldDouble;
-            }
-            
-            // Calculate check digit
-            const checkDigit = (sum * 9) % 10;
-            
-            // Combine and format
-            const fullNumber = partial + checkDigit;
-            return fullNumber.replace(/(\d{4})/g, '$1 ').trim();
-        }
+        // BIP39 English wordlist (first 256 words for demo - full list has 2048)
+        // In a real implementation, you'd fetch the complete list
+        const wordlist = [
+            "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse",
+            "access", "accident", "account", "accuse", "achieve", "acid", "acoustic", "acquire", "across", "act",
+            "action", "actor", "actress", "actual", "adapt", "add", "addict", "address", "adjust", "admit",
+            "adult", "advance", "advice", "aerobic", "affair", "afford", "afraid", "again", "age", "agent",
+            "agree", "ahead", "aim", "air", "airport", "aisle", "alarm", "album", "alcohol", "alert",
+            "alien", "all", "alley", "allow", "almost", "alone", "along", "already", "also", "alter",
+            "always", "amateur", "amazing", "among", "amount", "amused", "analyst", "anchor", "ancient", "anger",
+            "angle", "angry", "animal", "ankle", "announce", "annual", "another", "answer", "antenna", "antique",
+            "anxiety", "any", "apart", "apology", "appear", "apple", "approved", "april", "arch", "arctic",
+            "area", "arena", "argue", "arm", "armed", "armor", "army", "around", "arrange", "arrest",
+            "arrive", "arrow", "art", "artefact", "artist", "artwork", "ask", "aspect", "assault", "asset",
+            "assist", "assume", "asthma", "athlete", "atom", "attendance", "attitude", "attorney", "audio", "audit",
+            "august", "aunt", "author", "auto", "autumn", "average", "avocado", "avoid", "awake", "aware",
+            "away", "awesome", "awful", "awake", "awe", "back", "bad", "bag", "balance", "balloon",
+            "banana", "bank", "bar", "barbar", "bare", "bargain", "barrel", "base", "basic", "basket",
+            "battle", "beach", "bean", "beauty", "because", "become", "beef", "before", "begin", "behave",
+            "behind", "believe", "below", "belt", "bench", "benefit", "best", "betray", "better", "between",
+            "beyond", "bicycle", "bid", "bike", "bind", "biology", "bird", "birth", "bitter", "black",
+            "blade", "blame", "blanket", "blast", "bleach", "bless", "blind", "blood", "blossom", "blouse",
+            "blue", "blur", "blush", "board", "boat", "body", "boil", "bomb", "bone", "bonus",
+            "book", "boost", "border", "boring", "borrow", "boss", "bottom", "bowl", "box", "boy",
+            "bracket", "brain", "brand", "brave", "bread", "breath", "brick", "bridge", "brief", "bright",
+            "bring", "broad", "brooke", "brother", "brown", "brush", "bubble", "budget", "buffalo", "build",
+            "bulb", "bulk", "bullet", "bundle", "bunker", "burden", "burger", "burn", "burst", "bus",
+            "business", "busy", "butter", "buyer", "buzz", "cabbage", "cabin", "cable", "cactus", "cage",
+            "cake", "call", "calm", "camera", "camp", "can", "canal", "cancel", "candy", "cannon",
+            "canoe", "canvas", "canyon", "capable", "capital", "captain", "car", "carbon", "card", "carpet",
+            "carry", "cart", "case", "cash", "casino", "castle", "casual", "cat", "catalog", "catch",
+            "cause", "caution", "cave", "ceiling", "celery", "cement", "census", "century", "cereal", "certain",
+            "chair", "chalk", "champion", "change", "chaos", "chapter", "charge", "chase", "chat", "cheap",
+            "check", "cheese", "chef", "cherry", "chest", "chicken", "chief", "child", "chimney", "choice",
+            "chosen", "chronic", "chuckle", "chunk", "churn", "cigar", "cinnamon", "circle", "citizen", "city",
+            "civil", "claim", "class", "clean", "clerk", "clever", "click", "client", "cliff", "climb",
+            "clinic", "clip", "clock", "clog", "close", "cloth", "cloud", "clown", "club", "clump",
+            "cluster", "clutch", "coach", "coast", "coconut", "code", "coffee", "coil", "coin", "collect",
+            "color", "column", "combine", "come", "comfort", "comic", "common", "company", "concert", "conduct",
+            "cone", "confess", "consider", "constant", "consult", "consume", "continue", "contract", "convict", "convince",
+            "cook", "cookie", "cook", "cool", "cooperate", "copy", "coral", "core", "corn", "correct",
+            "cost", "cotton", "couch", "country", "couple", "course", "court", "cousin", "cover", "cow",
+            "crab", "crack", "craft", "crash", "crazy", "cream", "credit", "creek", "crest", "cricket",
+            "crime", "crisp", "critic", "crop", "cross", "crowd", "crown", "crude", "cry", "crystal",
+            "cube", "culture", "cup", "current", "curtain", "curve", "cushion", "custom", "cute", "cycle",
+            "dad", "damage", "damp", "dance", "danger", "daring", "dash", "daughter", "dawn", "day",
+            "deal", "debate", "debris", "decade", "december", "decide", "decline", "decorate", "decrease", "deer",
+            "defense", "define", "defy", "degree", "delay", "deliver", "demand", "demise", "denial", "dentist",
+            "deny", "depart", "depend", "deposit", "depth", "deputy", "derive", "describe", "desert", "design",
+            "desk", "despair", "destroy", "detail", "detect", "develop", "device", "devote", "diagram", "dial",
+            "diamond", "diary", "dice", "die", "diet", "differ", "digital", "dignity", "dilemma", "dinner",
+            "dinosaur", "direct", "dirt", "disagree", "discover", "disease", "dish", "dismiss", "disorder", "display",
+            "distance", "divert", "divide", "divorce", "dizzy", "doctor", "document", "dog", "doll", "dolphin",
+            "domain", "donate", "donkey", "donor", "door", "dot", "double", "doubt", "dough", "dove",
+            "draft", "dragon", "drain", "draw", "dream", "dress", "drill", "drink", "drive", "drop",
+            "drum", "dry", "duck", "dumb", "due", "during", "dust", "dutch", "duty", "dwarf",
+            "each", "eagle", "ear", "earnest", "ears", "ease", "east", "easy", "eat", "eclipse",
+            "edge", "edit", "education", "effort", "egg", "eight", "either", "elbow", "elder", "electric",
+            "elegant", "element", "elephant", "elevate", "elite", "else", "embark", "embody", "embrace", "emerge",
+            "emotion", "employ", "empower", "empty", "enable", "enclose", "encounter", "encyclopedia", "end", "endless",
+            "endorse", "enemy", "energy", "enforce", "engage", "engine", "enhance", "enjoy", "enlist", "enough",
+            "enrich", "enroll", "ensure", "enter", "entire", "entry", "envelope", "episode", "equal", "equip",
+            "equipment", "erase", "erg", "erode", "erosion", "error", "erupt", "escape", "essay", "essence",
+            "estate", "eternal", "ethics", "evidence", "evil", "evolve", "exact", "example", "excess", "exchange",
+            "excite", "exercise", "exhibit", "exile", "exist", "exit", "exotic", "expand", "expect", "expire",
+            "explain", "expose", "express", "extend", "extra", "eye", "eyebrow", "fabric", "face", "facility",
+            "fact", "fade", "fail", "fair", "faith", "fake", "fall", "false", "fame", "family",
+            "fan", "far", "farm", "farmer", "fast", "fat", "father", "fatigue", "fault", "favorite",
+            "fawn", "fear", "feast", "feather", "feature", "fed", "fee", "feed", "feel", "female",
+            "fence", "festival", "fetch", "fever", "few", "fiber", "fibre", "fiction", "field", "figure",
+            "file", "film", "filter", "final", "find", "fine", "finger", "finish", "fire", "firm",
+            "first", "fish", "fit", "flag", "flame", "flash", "flat", "flavor", "flee", "flight",
+            "flip", "float", "flock", "flora", "flower", "fly", "foam", "focus", "fog", "fold",
+            "folk", "follow", "food", "foot", "football", "force", "forecast", "forest", "forget", "form",
+            "former", "formula", "forth", "fortune", "forum", "forward", "fossil", "foster", "found", "four",
+            "fox", "fraction", "fragile", "frame", "freedom", "freight", "french", "fresh", "friend", "frog",
+            "from", "front", "fruit", "fuel", "fun", "function", "funeral", "funny", "furnace", "furniture",
+            "future", "gadget", "gain", "game", "gap", "garage", "garbage", "garden", "garlic", "gas",
+            "gasp", "gate", "gather", "gauge", "gay", "gazelle", "gel", "gem", "gender", "gene",
+            "general", "genius", "genre", "gentle", "genuine", "gesture", "ghost", "giant", "gift", "giraffe",
+            "girl", "give", "glass", "glove", "glow", "glue", "goal", "goat", "god", "gold",
+            "good", "goose", "gorilla", "gospel", "govern", "grab", "grace", "gradient", "grain", "grant",
+            "grape", "grass", "gravity", "great", "green", "grid", "grief", "grind", "grip", "grocery",
+            "group", "grow", "growth", "grunt", "guard", "guess", "guide", "guitar", "gun", "gym",
+            "habit", "hair", "half", "hammer", "hand", "handy", "happy", "harbor", "hard", "hare",
+            "harm", "harmony", "harp", "harvest", "haste", "hat", "have", "hawk", "hay", "hazard",
+            "head", "health", "hear", "heart", "hearth", "heat", "heavy", "hedgehog", "height", "hello",
+            "helmet", "help", "herb", "herd", "heritage", "heron", "hesitate", "hi", "hidden", "high",
+            "highlight", "hike", "hill", "hinder", "hip", "hire", "history", "hit", "hold", "hole",
+            "holiday", "hollow", "holy", "home", "hone", "honor", "hope", "horn", "horse", "hospital",
+            "host", "hotel", "hour", "hover", "hub", "huge", "human", "humble", "humor", "hundred",
+            "hunger", "hunt", "hurdle", "hurry", "husband", "hush", "hybrid", "ice", "icon", "idea",
+            "ignore", "ill", "illegal", "illness", "illuminate", "image", "imitate", "imagine", "immense", "immune",
+            "impact", "impose", "improve", "impulse", "include", "income", "increase", "index", "indicate", "indoor",
+            "industry", "infant", "inflict", "inform", "inhale", "inheritance", "initiate", "injection", "injury", "inn",
+            "inner", "innocent", "insect", "inside", "inspire", "install", "intact", "interest", "invest", "investment",
+            "invite", "involve", "iron", "island", "isolate", "issue", "it", "item", "ivory", "jacket",
+            "jail", "janitor", "jam", "january", "jazz", "jealous", "jeans", "jelly", "jet", "jewel",
+            "jeweler", "job", "join", "joke", "journey", "judge", "juice", "july", "jump", "jungle",
+            "junior", "jurisdiction", "just", "juvenile", "kangaroo", "keen", "keep", "ken", "kettle",
+            "key", "kickoff", "kid", "kidney", "kind", "kingdom", "kiss", "kite", "kitten", "knee",
+            "knife", "knock", "know", "lab", "label", "labor", "lack", "ladder", "lady", "lake",
+            "lamb", "lamplight", "language", "laptop", "large", "later", "latin", "laugh", "laundry",
+            "lava", "law", "lawn", "lawsuit", "leader", "leaf", "learn", "leave", "lecture", "left",
+            "leg", "legal", "legend", "leisure", "lemon", "lend", "length", "lens", "leprosy", "lesson",
+            "letter", "level", "liar", "library", "license", "lie", "life", "lift", "light", "like",
+            "limb", "limit", "link", "lion", "liquid", "list", "little", "live", "livestock", "load",
+            "loan", "lobby", "local", "lock", "locomotive", "log", "logic", "lonely", "long", "look",
+            "loop", "loser", "loss", "lot", "love", "loyal", "lucky", "luggage", "lumber", "lunar",
+            "lunch", "lung", "luxury", "lyrics", "machine", "mad", "magic", "magnet", "maid", "main",
+            "maintain", "major", "make", "male", "mammal", "man", "manage", "mandate", "mango", "mansion",
+            "manual", "map", "marble", "marriage", "mask", "mass", "master", "match", "material", "math",
+            "matrix", "matter", "maximum", "maze", "me", "meal", "mean", "measure", "meat", "mechanic",
+            "mechanism", "medal", "media", "medical", "medium", "meet", "melody", "melt", "member", "memory",
+            "mention", "menu", "mercy", "merge", "merit", "merry", "mesh", "metal", "metro", "micro",
+            "middle", "might", "migrant", "military", "milk", "mill", "million", "mine", "mineral", "minimum",
+            "minor", "minute", "miracle", "mirror", "misery", "miss", "missile", "mission", "mistake", "mix",
+            "mixed", "mo", "mobile", "model", "moderate", "modify", "molecule", "monday", "money", "monkey",
+            "monitor", "monster", "month", "moon", "moral", "more", "morning", "mortgage", "mosque", "mosquito",
+            "mother", "motion", "motor", "mountain", "mouse", "mouth", "move", "movie", "much", "mud",
+            "mushroom", "music", "must", "mutual", "myself", "mystery", "myth", "na", "nail", "name",
+            "napkin", "narrative", "narrow", "nation", "native", "natural", "navigate", "near", "nearly", "necessary",
+            "neck", "need", "negative", "neglect", "neither", "nephew", "nerve", "nest", "net", "network",
+            "neutral", "never", "new", "next", "nice", "niece", "night", "nitrogen", "noble", "noise",
+            "none", "noon", "norm", "north", "nose", "not", "note", "nothing", "notice", "novel",
+            "now", "nuclear", "number", "nurse", "nut", "oak", "obey", "object", "oblige", "obscure",
+            "observe", "obtain", "obvious", "occur", "ocean", "october", "odor", "off", "offer", "office",
+            "often", "oil", "okay", "old", "olive", "olympic", "omega", "on", "once", "one",
+            "onion", "online", "open", "opinion", "opportunity", "optimize", "or", "orange", "orbit", "orchard",
+            "order", "organism", "organize", "origin", "original", "ornament", "orphan", "oscillate", "ostrich", "other",
+            "otherwise", "otter", "outcome", "outdoor", "outer", "output", "outside", "oval", "oven", "over",
+            "owner", "oxygen", "ozone", "pac", "pack", "package", "page", "pain", "paint", "pair",
+            "palace", "palm", "pan", "panda", "panic", "paper", "paragon", "parcel", "park", "parrot",
+            "parsh", "part", "partial", "participant", "particle", "particular", "partly", "party", "pass",
+            "passenger", "passion", "past", "paste", "patent", "path", "patient", "patrol", "pattern", "pause",
+            "pay", "peace", "peach", "peak", "pear", "peasant", "pelican", "pen", "penalty", "pencil",
+            "people", "pepper", "per", "perfect", "perfume", "perhaps", "period", "peripheral", "permanent", "permission",
+            "permit", "person", "pet", "petroleum", "pew", "phase", "phenomenon", "philosophy", "phone", "photo",
+            "phrase", "physical", "physician", "piano", "pick", "picture", "pie", "pig", "pigeon", "pill",
+            "pilot", "pin", "pine", "pink", "pioneer", "pipe", "pitch", "place", "plague", "plan",
+            "plane", "planet", "plankton", "plate", "platform", "play", "player", "plead", "pleasure", "plenty",
+            "plier", "plod", "plot", "pluck", "plug", "plumber", "plus", "pneumonia", "pocket", "poem",
+            "poet", "point", "poison", "polar", "pole", "police", "pond", "pony", "pool", "popular",
+            "portion", "position", "possible", "post", "postage", "poster", "pot", "potato", "pottery", "poverty",
+            "powder", "power", "practical", "praise", "pray", "precious", "prejudice", "premium", "present", "president",
+            "press", "pressure", "pretend", "pretty", "prevent", "previous", "price", "pride", "primary", "print",
+            "prison", "private", "prize", "probability", "problem", "process", "produce", "profit", "program", "project",
+            "promise", "promote", "pronounce", "proof", "prop", "propeller", "prospect", "protect", "protein", "prove",
+            "provide", "public", "puddle", "pull", "pulp", "pump", "punish", "purpose", "purse", "python",
+            "quantity", "quantum", "quarter", "queen", "quick", "quiet", "quit", "quiz", "race", "radar",
+            "radical", "radio", "rail", "rain", "raise", "ranch", "random", "range", "rank", "rape",
+            "rate", "rather", "raven", "raw", "reach", "react", "read", "realization", "real", "rear",
+            "reason", "rebuild", "recall", "receive", "recipe", "recertify", "recip", "recipient", "recite", "recover",
+            "recycle", "redeem", "rediscover", "reduce", "reflect", "reform", "refugee", "refuse", "region", "regret",
+            "reject", "relax", "release", "relieve", "religion", "remain", "remember", "remind", "remove", "render",
+            "renew", "renovate", "repair", "repeat", "replace", "report", "require", "rescue", "resemble", "resist",
+            "resolution", "respect", "rest", "restaurant", "result", "retail", "retain", "retire", "return", "reunite",
+            "reveal", "review", "reward", "rhythm", "rib", "ribbon", "rice", "rich", "ride", "ridge",
+            "rifle", "right", "rim", "ring", "riot", "rip", "risk", "ritual", "rival", "river",
+            "road", "roast", "robot", "rock", "rocket", "romance", "root", "rope", "rose", "rotate",
+            "round", "route", "royal", "rub", "rubber", "rugby", "rule", "run", "running", "rush",
+            "sad", "safe", "sail", "salad", "salary", "sale", "salmon", "salt", "same", "sample",
+            "sanctuary", "sand", "sandwich", "santa", "saturday", "sauce", "savings", "savoy", "saw", "saxon",
+            "scaffold", "scale", "scalp", "scanner", "scared", "scenario", "science", "scope", "score", "scout",
+            "scrap", "screen", "screw", "scrub", "sea", "seal", "search", "season", "seat", "second",
+            "secret", "section", "security", "see", "seed", "seek", "seem", "seesaw", "select", "self",
+            "sell", "seminar", "senate", "senior", "sense", "sentence", "septic", "series", "serious", "servant",
+            "serve", "service", "sesame", "settle", "settlement", "seven", "sever", "severe", "sex", "shade",
+            "shadow", "shake", "shall", "shalom", "shame", "share", "shark", "she", "shed", "sheep",
+            "sheet", "shelf", "shell", "sheriff", "shield", "shift", "shingle", "ship", "shock", "shoe",
+            "shoebox", "shoot", "shop", "short", "shortcut", "shot", "shoulder", "shove", "show", "shred",
+            "shrimp", "shrug", "shut", "shuttle", "sibling", "sick", "side", "sidewalk", "sight", "signal",
+            "sign", "significant", "silent", "silk", "silly", "silver", "similar", "simple", "since", "sincere",
+            "single", "sink", "siren", "sister", "sit", "sitting", "situation", "six", "size", "skate",
+            "skateboard", "skeleton", "ski", "skill", "skin", "skirt", "skull", "slap", "sled", "sleep",
+            "slice", "slide", "slight", "slim", "slip", "slog", "slower", "slowly", "small", "smart",
+            "smell", "smile", "smog", "snake", "snap", "sneak", "sneeze", "snow", "soap", "soccer",
+            "social", "soda", "soil", "solar", "soldier", "solid", "solution", "solve", "someone", "somewhere",
+            "son", "song", "soon", "sorry", "sort", "soul", "sound", "soup", "source", "south",
+            "space", "spare", "speak", "speaker", "spear", "special", "species", "specific", "specimen", "spectrum",
+            "spend", "spider", "spin", "spiritual", "split", "sponge", "spoon", "sport", "spot", "spray",
+            "spring", "sprinkle", "sprout", "spy", "square", "squash", "squid", "squirrel", "stage", "stain",
+            "stair", "stake", "stall", "stamp", "star", "start", "state", "statement", "station", "statistics",
+            "status", "stay", "steam", "steel", "stem", "step", "stereo", "stick", "stigma", "stile", "still",
+            "stock", "stomach", "stone", "stop", "storage", "store", "storm", "story", "stove", "strategy",
+            "stream", "street", "strength", "stress", "stretch", "strike", "string", "strip", "stroke", "strong",
+            "structure", "struggle", "student", "style", "subject", "submit", "subway", "success", "such", "sudden",
+            "suffer", "sugar", "suggest", "suit", "sun", "sunflower", "sunset", "super", "supplement", "suppose",
+            "supply", "support", "surprise", "surround", "survey", "suspect", "suspend", "sustain", "swallow", "swamp",
+            "swap", "swat", "sway", "sweden", "sweet", "swim", "swimming", "swing", "switch", "sword",
+            "symbol", "symptom", "synagogue", "sync", "syndrome", "system", "table", "tablet", "taco", "tail",
+            "talent", "talk", "tank", "tap", "tape", "target", "task", "taste", "tax", "teach",
+            "team", "tear", "technical", "technology", "tee", "teen", "telephone", "telescope", "television", "tell",
+            "temple", "tenant", "tennis", "terrace", "test", "text", "texture", "thank", "that", "the",
+            "theater", "theology", "them", "then", "theory", "there", "therefore", "these", "they", "thick",
+            "thief", "thigh", "thing", "think", "third", "this", "thorough", "thorn", "those", "though",
+            "thought", "three", "thrash", "thrift", "throne", "throw", "thumb", "thursday", "ticket", "tide",
+            "tie", "tiger", "timber", "time", "timeline", "tinge", "tip", "tire", "title", "to",
+            "today", "toe", "together", "toilet", "token", "tomato", "tomorrow", "tone", "tongue", "tonight",
+            "tool", "tooth", "top", "topic", "torch", "torrent", "tortoise", "total", "tourist", "town",
+            "toxic", "toxin", "trace", "track", "trade", "tradition", "traffic", "tragedy", "trail", "train",
+            "trainer", "trans", "transfer", "transform", "transit", "trap", "travel", "tree", "trench", "trend",
+            "trial", "triple", "tropic", "trouble", "truck", "true", "trunk", "try", "tsunami", "tub",
+            "tuck", "tuesday", "tug", "tuition", "tumble", "tune", "tunnel", "turkey", "turn", "turtle",
+            "twelve", "twenty", "twice", "twin", "twist", "two", "type", "typical", "ugly", "uk",
+            "ulcer", "ultra", "umbrella", "unable", "unaware", "uncle", "uncover", "under", "undertake", "underwater",
+            "undo", "unfair", "unfold", "unhappy", "unhealthy", "uniform", "unify", "union", "unique", "unite",
+            "universe", "unknown", "unlawful", "unload", "unlock", "unnatural", "unpleasant", "unreasonable", "unscrew", "unsure",
+            "unsteady", "unstreet", "untie", "until", "up", "update", "upgrade", "uphold", "upon", "upper",
+            "upset", "upside", "upward", "urban", "urgent", "urine", "usa", "usage", "use", "used",
+            "useful", "useless", "usual", "utilize", "utmost", "utter", "vacant", "vacation", "vaccine", "vacuum",
+            "vagina", "valid", "valley", "valve", "van", "vane", "vanish", "vapor", "various", "vase",
+            "vault", "vegetable", "vendor", "vent", "verdict", "verify", "version", "vet", "vi", "vibrate",
+            "video", "view", "vigil", "village", "villa", "vine", "vinegar", "violence", "violet", "violin",
+            "vip", "virus", "visit", "vista", "visual", "vital", "vitamin", "vocal", "vocabulary", "voice",
+            "void", "volcano", "volume", "volunteer", "vote", "voyage", "vulnerable", "w", "wage", "wagon",
+            "wait", "wallet", "wander", "warm", "warrior", "wash", "waste", "water", "wave", "way",
+            "wealth", "weapon", "wear", "weed", "week", "weigh", "weird", "wheel", "whale", "what",
+            "wheelchair", "when", "where", "which", "while", "whip", "whisper", "white", "who", "whole",
+            "wholesale", "whom", "wide", "widow", "width", "wife", "wild", "will", "win", "wind",
+            "window", "wine", "wing", "winner", "winter", "wire", "wisdom", "wish", "witness", "wolf",
+            "woman", "wonder", "wood", "woodwork", "wool", "word", "work", "worker", "world", "worry",
+            "worse", "worth", "wrap", "wrist", "write", "wrong", "x-ray", "xbox", "xi", "xmas",
+            "yahoo", "yard", "yarn", "yeast", "yellow", "yes", "yesterday", "yet", "yield", "you",
+            "young", "your", "youth", "yule", "zebra", "zero", "zone", "zoo"
+        ];
 
         // DOM Elements
-        const codeDisplay = document.getElementById('codeDisplay');
-        const codeText = document.getElementById('codeText');
         const generateBtn = document.getElementById('generateBtn');
         const copyBtn = document.getElementById('copyBtn');
-        const toggleBtn = document.getElementById('toggleBtn');
-        const codeList = document.getElementById('codeList');
+        const entropyDisplay = document.getElementById('entropyDisplay');
+        const mnemonicDisplay = document.getElementById('mnemonicDisplay');
         
-        // State
-        let currentCode = '';
-        let isValid = true; // Start as valid (generated codes are valid by Luhn)
-        
-        // Initialize
-        function init() {
-            generateNewCode();
-            updateDisplay();
-        }
-        
-        // Generate a new code
-        function generateNewCode() {
-            currentCode = generateValidLuhnCode();
-            // By default, generated codes are valid
-            isValid = true;
-            toggleBtn.textContent = 'Mark as Invalid';
-            updateDisplay();
-        }
-        
-        // Update the display
-        function updateDisplay() {
-            codeText.textContent = currentCode;
+        // Generate cryptographically insecure random bytes (for demo only!)
+        function generateInsecureEntropy(bits) {
+            const bytes = Math.ceil(bits / 8);
+            const entropyArray = new Uint8Array(bytes);
             
-            // Update visual state
-            codeDisplay.classList.remove('valid', 'invalid');
-            if (isValid) {
-                codeDisplay.classList.add('valid');
-            } else {
-                codeDisplay.classList.add('invalid');
+            // WARNING: Math.random() is NOT cryptographically secure!
+            for (let i = 0; i < bytes; i++) {
+                entropyArray[i] = Math.floor(Math.random() * 256);
             }
+            
+            return entropyArray;
         }
         
-        // Copy code to clipboard
-        function copyCode() {
-            navigator.clipboard.writeText(currentCode).then(() => {
-                // Visual feedback
-                const originalText = copyBtn.textContent;
-                copyBtn.textContent = 'Copied!';
-                setTimeout(() => {
-                    copyBtn.textContent = originalText;
-                }, 1500);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                alert('Failed to copy code to clipboard');
-            });
+        // Convert entropy to binary string
+        function entropyToBinary(entropyArray) {
+            return entropyArray.map(byte => 
+                byte.toString(2).padStart(8, '0')
+            ).join('');
         }
         
-        // Toggle validity status
-        function toggleValidity() {
-            isValid = !isValid;
-            toggleBtn.textContent = isValid ? 'Mark as Invalid' : 'Mark as Valid';
-            updateDisplay();
+        // Calculate checksum for BIP39
+        function calculateChecksum(entropyArray) {
+            // For 128-bit entropy (16 bytes), checksum is 4 bits (first byte of SHA256)
+            // In a real implementation, you'd use a proper SHA256 library
+            // For demo, we'll simulate with a simple hash
+            const entropyBinary = entropyToBinary(entropyArray);
+            const entropyLength = entropyArray.length * 8;
+            const checksumBits = Math.floor(entropyLength / 32); // 4 bits for 128-bit entropy
             
-            // Add to history when toggled
-            addToHistory();
+            // Simplified checksum (NOT REAL - for demo only)
+            // Real BIP39 uses SHA256(entropy)[0:checksumBits]
+            let checksum = 0;
+            for (let i = 0; i < entropyArray.length; i++) {
+                checksum ^= entropyArray[i];
+            }
+            return checksum & ((1 << checksumBits) - 1);
         }
         
-        // Add current code to history list
-        function addToHistory() {
-            const item = document.createElement('div');
-            item.className = `code-item ${isValid ? 'valid' : 'invalid'}`;
+        // Generate mnemonic from entropy
+        function entropyToMnemonic(entropyArray) {
+            const entropyBinary = entropyToBinary(entropyArray);
+            const entropyLength = entropyArray.length * 8;
+            const checksumBits = Math.floor(entropyLength / 32);
             
-            const codeSpan = document.createElement('span');
-            codeSpan.className = 'item-code';
-            codeSpan.textContent = currentCode;
+            // Get checksum (simplified for demo)
+            const checksum = calculateChecksum(entropyArray);
+            const checksumBinary = checksum.toString(2).padStart(checksumBits, '0');
             
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'item-actions';
+            // Combine entropy + checksum
+            const combinedBinary = entropyBinary + checksumBinary;
             
-            const copyItemBtn = document.createElement('button');
-            copyItemBtn.textContent = 'Copy';
-            copyItemBtn.onclick = () => {
-                navigator.clipboard.writeText(currentCode).then(() => {
-                    copyItemBtn.textContent = 'Copied!';
+            // Split into 11-bit chunks and map to words
+            const words = [];
+            for (let i = 0; i < combinedBinary.length; i += 11) {
+                const elevenBits = combinedBinary.substr(i, 11);
+                const index = parseInt(elevenBits, 2);
+                words.push(wordlist[index]);
+            }
+            
+            return words;
+        }
+        
+        // Generate a new seed
+        function generateSeed() {
+            // Generate 128-bit entropy (16 bytes) for 12-word mnemonic
+            const entropy = generateInsecureEntropy(16);
+            
+            // Display entropy
+            const entropyHex = Array.from(entropy)
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join(' ');
+            entropyDisplay.textContent = `Entropy (hex): ${entropyHex}\n⚠️ WARNING: Using insecure Math.random()!`;
+            
+            // Generate mnemonic
+            const mnemonicWords = entropyToMnemonic(entropy);
+            const mnemonic = mnemonicWords.join(' ');
+            mnemonicDisplay.textContent = mnemonic;
+            
+            // Add some visual flair
+            mnemonicDisplay.style.opacity = '0';
+            setTimeout(() => {
+                mnemonicDisplay.style.opacity = '1';
+            }, 100);
+        }
+        
+        // Copy mnemonic to clipboard
+        function copyMnemonic() {
+            const mnemonic = mnemonicDisplay.textContent;
+            if (mnemonic && mnemonic !== 'Your mnemonic phrase will appear here') {
+                navigator.clipboard.writeText(mnemonic).then(() => {
+                    // Visual feedback
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = 'Copied! ✓';
                     setTimeout(() => {
-                        copyItemBtn.textContent = 'Copy';
-                    }, 1000);
+                        copyBtn.textContent = originalText;
+                    }, 1500);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy to clipboard');
                 });
-            };
-            
-            const removeBtn = document.createElement('button');
-            removeBtn.textContent = 'Remove';
-            removeBtn.style.background = '#e74c3c';
-            removeBtn.onclick = () => {
-                item.remove();
-            };
-            
-            actionsDiv.appendChild(copyItemBtn);
-            actionsDiv.appendChild(removeBtn);
-            
-            item.appendChild(codeSpan);
-            item.appendChild(actionsDiv);
-            
-            // Add to top of list
-            codeList.insertBefore(item, codeList.firstChild);
-            
-            // Limit history to 20 items
-            if (codeList.children.length > 20) {
-                codeList.removeChild(codeList.lastChild);
             }
         }
         
         // Event Listeners
-        generateBtn.addEventListener('click', generateNewCode);
-        copyBtn.addEventListener('click', copyCode);
-        toggleBtn.addEventListener('click', toggleValidity);
+        generateBtn.addEventListener('click', generateSeed);
+        copyBtn.addEventListener('click', copyMnemonic);
         
-        // Initialize on load
-        init();
+        // Initialize
+        generateSeed();
     </script>
 </body>
 </html>
